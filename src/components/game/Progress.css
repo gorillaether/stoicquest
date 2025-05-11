@@ -1,0 +1,21 @@
+/* src/components/game/Progress.css */
+.progress-container {
+  margin-bottom: 20px;
+  font-family: sans-serif; /* Example font */
+}
+
+.progress-title {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.progress-text {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: #555;
+  text-align: center;
+}
+
+/* Styles for the ProgressBar component itself are in ProgressBar.css */

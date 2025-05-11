@@ -1,0 +1,66 @@
+/* src/pages/Chapter.css */
+.chapter-page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensure the container takes at least the full viewport height */
+  font-family: sans-serif; /* Example font */
+  background-color: #f4f4f4; /* Example background color */
+}
+
+.chapter-page-content {
+  flex: 1; /* Allows the content area to grow */
+  padding: 20px;
+  max-width: 900px; /* Max width for chapter content */
+  margin: 0 auto; /* Center the content */
+  width: 100%; /* Ensure it takes full width up to max-width */
+}
+
+.chapter-page-content.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.chapter-page-title {
+  font-size: 2.2rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+.chapter-challenges-area,
+.chapter-reflection-area {
+    margin-top: 30px; /* Space above challenges and reflection */
+}
+
+.chapter-area-title {
+    font-size: 1.8rem;
+    color: #555;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+
+/* Styles for the Card components used for messages */
+.chapter-not-found-card,
+.chapter-locked-card,
+.chapter-error-card {
+    text-align: center;
+    padding: 30px;
+    margin-top: 50px;
+}
+
+.chapter-not-found-card h1,
+.chapter-locked-card h1,
+.chapter-error-card h1 {
+    color: #dc3545; /* Danger color */
+    margin-bottom: 15px;
+}
+
+.chapter-locked-card {
+    border-color: #ffc107; /* Warning color */
+}

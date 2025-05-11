@@ -1,28 +1,25 @@
-import './App.css';
+// src/App.jsx
+import React from 'react';
+import './App.css'; // Import global styles for the App container
+import { UserProvider } from './contexts/UserContext'; // Import the User Context Provider
+import { GameProvider } from './contexts/GameContext'; // Import the Game Context Provider
+import AppRoutes from './routes'; // Import the AppRoutes component that defines your routes
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src="Octocat.png" className="App-logo" alt="logo" />
-        <p>
-          GitHub Codespaces <span className="heart">♥️</span> React
-        </p>
-        <p className="small">
-          Edit <code>src/App.jsx</code> and save to reload.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </p>
-      </header>
-    </div>
+    // Wrap the entire application with the context providers
+    <UserProvider>
+      <GameProvider>
+        <div className="App">
+          {/*
+            The AppRoutes component contains your routing configuration.
+            It will render the appropriate page component (Home, Game, Profile, etc.)
+            based on the current URL path.
+          */}
+          <AppRoutes />
+        </div>
+      </GameProvider>
+    </UserProvider>
   );
 }
 

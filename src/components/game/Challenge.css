@@ -1,0 +1,52 @@
+/* src/components/game/Challenge.css */
+.challenge-container {
+  padding: 20px;
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  font-family: sans-serif;
+}
+
+/* .challenge-completed {
+    border-color: #28a745;
+    background-color: #e9ffe9;
+} */
+
+
+.challenge-title {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+}
+
+.challenge-description {
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.challenge-interactive-area {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed #ccc;
+}
+
+.challenge-interactive-area p {
+    color: #777;
+    font-style: italic;
+    text-align: center;
+}
+
+/* Add styles for specific challenge types (e.g., multiple-choice options, textarea) as needed */
+/*
+.challenge-interactive-area button { ... }
+.challenge-interactive-area textarea { ... }
+*/
+
+/* .challenge-completion-message {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #28a745;
+    text-align: center;
+} */

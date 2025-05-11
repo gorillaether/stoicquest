@@ -1,0 +1,94 @@
+/* src/components/ui/Modal.css */
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed; /* fixed */
+  top: 0; /* inset-0 */
+  left: 0; /* inset-0 */
+  right: 0; /* inset-0 */
+  bottom: 0; /* inset-0 */
+  display: flex; /* flex */
+  align-items: center; /* items-center */
+  justify-content: center; /* justify-center */
+  background-color: rgba(0, 0, 0, 0.5); /* bg-black bg-opacity-50 */
+  z-index: 1000; /* z-50 - adjusted for clarity, ensure it's high */
+  padding: 1rem; /* p-4 approximation */
+  /* Optional: Add fade-in animation */
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* Fade-in animation keyframes */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: white; /* bg-white */
+  border-radius: 8px; /* rounded-lg approximation */
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05); /* shadow-xl approximation */
+  max-width: 28rem; /* max-w-md approximation (448px) */
+  width: 100%; /* w-full */
+  transform: scale(1); /* Base scale for transition */
+  transition: all 0.2s ease-in-out; /* transition-all */
+  font-family: sans-serif; /* Example font */
+   /* Optional: Add slide-up animation or scale-in */
+   animation: scale-in 0.3s ease-out forwards;
+}
+
+/* Scale-in animation keyframes */
+@keyframes scale-in {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+
+/* Modal Header */
+.modal-header {
+  display: flex; /* flex */
+  justify-content: space-between; /* justify-between */
+  align-items: center; /* items-center */
+  padding: 1rem; /* p-4 */
+  border-bottom: 1px solid #e5e7eb; /* border-b border-gray-200 approximation */
+}
+
+.modal-title {
+    font-size: 1.25rem; /* text-xl */
+    font-weight: 600; /* font-semibold */
+    margin: 0; /* Remove default margin */
+    color: #1f2937; /* Example text color */
+}
+
+/* Modal Close Button */
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem; /* Add some padding for easier clicking */
+  color: #6b7280; /* text-gray-500 */
+  transition: color 0.2s ease-in-out;
+}
+
+.modal-close:hover {
+  color: #374151; /* hover:text-gray-700 */
+}
+
+.modal-close:focus {
+  outline: none; /* focus:outline-none */
+  /* Add a visible focus indicator if needed for accessibility */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* Example focus ring */
+  border-radius: 4px; /* Match button border-radius */
+}
+
+.modal-close-icon {
+    width: 1.5rem; /* w-6 */
+    height: 1.5rem; /* h-6 */
+    display: block; /* Ensure the SVG behaves as a block */
+}
+
+
+/* Modal Body */
+.modal-body {
+  padding: 1.5rem; /* p-6 */
+}

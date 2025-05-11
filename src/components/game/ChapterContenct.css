@@ -1,0 +1,146 @@
+/* src/components/game/ChapterContent.css */
+/* Add styles based on the class names in ChapterContent.jsx */
+
+.chapter-content-card {
+  /* Styles for the Card component container */
+  max-width: 800px; /* Example max-width */
+  margin: 20px auto; /* Center the card */
+  font-family: sans-serif;
+}
+
+.chapter-content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.chapter-title-area {
+  display: flex;
+  align-items: center;
+}
+
+.chapter-title {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.chapter-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.translation-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.translation-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.translation-toggle:hover {
+  background-color: #f0f0f0;
+}
+
+.translation-options {
+  position: absolute;
+  right: 0;
+  top: 100%; /* Position below the toggle button */
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  min-width: 150px;
+}
+
+.translation-options button {
+  display: block;
+  width: 100%;
+  padding: 8px 15px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.translation-options button:hover {
+  background-color: #f0f0f0;
+}
+
+.translation-options button.bg-gray-100 {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+
+.bookmark-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.bookmark-button:hover {
+   background-color: #f0f0f0;
+}
+
+
+.section-title {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #555;
+}
+
+.chapter-text p {
+  line-height: 1.6;
+  margin-bottom: 1em;
+  color: #333;
+}
+
+.navigation-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.nav-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.nav-button:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.nav-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.section-indicator {
+  font-size: 0.9rem;
+  color: #777;
+}

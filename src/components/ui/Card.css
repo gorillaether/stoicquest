@@ -1,0 +1,112 @@
+/* src/components/ui/Card.css */
+.card-container {
+  border-radius: 8px; /* rounded-lg approximation */
+  padding: 16px; /* p-4 approximation */
+  transition: all 0.2s ease-in-out; /* transition-all duration-200 approximation */
+  font-family: sans-serif; /* Example font */
+  position: relative; /* Needed for potential pseudo-elements or absolute positioning within */
+}
+
+/* Variants */
+.card-variant-default {
+  background-color: white; /* bg-white */
+  color: #1f2937; /* text-gray-800 */
+}
+
+.card-variant-primary {
+  background-color: #eff6ff; /* bg-blue-50 */
+  color: #1e40af; /* text-blue-800 */
+}
+
+.card-variant-secondary {
+  background-color: #f3e8ff; /* bg-purple-50 */
+  color: #6b21a8; /* text-purple-800 */
+}
+
+.card-variant-success {
+  background-color: #dcfce7; /* bg-green-50 */
+  color: #166534; /* text-green-800 */
+}
+
+.card-variant-warning {
+  background-color: #fffbeb; /* bg-yellow-50 */
+  color: #92400e; /* text-yellow-700 */
+}
+
+.card-variant-danger {
+  background-color: #fee2e2; /* bg-red-50 */
+  color: #991b1b; /* text-red-800 */
+}
+
+/* Borders */
+.card-bordered {
+    border-width: 1px;
+    border-style: solid;
+}
+
+/* Variant Specific Border Colors (only applies if .card-bordered is also present) */
+.card-bordered.card-border-default {
+    border-color: #e5e7eb; /* border-gray-200 */
+}
+.card-bordered.card-border-primary {
+    border-color: #bfdbfe; /* border-blue-200 */
+}
+.card-bordered.card-border-secondary {
+     border-color: #d8b4fe; /* border-purple-200 */
+}
+.card-bordered.card-border-success {
+    border-color: #abf7b1; /* border-green-200 */
+}
+.card-bordered.card-border-warning {
+    border-color: #fde68a; /* border-yellow-200 */
+}
+.card-bordered.card-border-danger {
+    border-color: #fca5a5; /* border-red-200 */
+}
+
+
+/* Elevation (Shadow) */
+.card-elevated {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06); /* shadow-md approximation */
+}
+
+/* Interactive States */
+.card-interactive {
+  cursor: pointer;
+}
+
+.card-interactive:hover {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05); /* hover:shadow-lg approximation */
+}
+
+.card-interactive:active {
+  transform: scale(0.98); /* active:scale-98 */
+}
+
+/* Focus styles (for keyboard navigation) - basic example */
+.card-interactive:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* focus:ring-2 focus:ring-blue-300 with offset simulation */
+}
+
+
+/* Internal Title and Subtitle Styles */
+.card-title-area {
+    margin-bottom: 8px; /* mb-2 approximation */
+}
+
+.card-title {
+    font-weight: 600; /* font-semibold */
+    font-size: 1.125rem; /* text-lg */
+    margin: 0; /* Remove default margin */
+}
+
+.card-subtitle {
+    font-size: 0.875rem; /* text-sm */
+    opacity: 0.75; /* opacity-75 */
+    margin: 0; /* Remove default margin */
+}
+
+.card-content {
+    /* Styles for the main content area within the card */
+}

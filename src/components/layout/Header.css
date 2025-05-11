@@ -1,0 +1,86 @@
+/* src/components/layout/Header.css */
+.header-container {
+  background-color: #f0f0f0;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  font-family: sans-serif;
+}
+
+.game-title h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.user-status-section {
+    display: flex;
+    align-items: center;
+    gap: 30px; /* Space between user info and progress */
+}
+
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Styles for the Avatar component within the header */
+.user-info .avatar-container {
+    width: 40px; /* Smaller avatar in header */
+    height: 40px; /* Smaller avatar in header */
+    border-width: 2px; /* Slightly thinner border */
+    margin-bottom: 0; /* Remove bottom margin */
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: bold;
+    color: #333;
+}
+
+.user-level {
+    font-size: 0.8rem;
+    color: #555;
+}
+
+
+.game-progress-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px; /* Space between overall and next level progress */
+}
+
+.overall-progress,
+.next-level-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.progress-label {
+    font-weight: bold;
+}
+
+
+/* Styles for the ProgressBar component within the header */
+.game-progress-info .progress-bar-container {
+    width: 150px; /* Adjust width as needed */
+    height: 12px; /* Adjust height as needed */
+}
+
+.progress-percentage {
+    font-size: 0.8rem;
+    font-weight: bold;
+}

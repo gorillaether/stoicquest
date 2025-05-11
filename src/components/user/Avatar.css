@@ -1,0 +1,33 @@
+/* src/components/user/Avatar.css */
+.avatar-container {
+  width: 100px; /* Default size, can be overridden by parent component or modifiers */
+  height: 100px; /* Default size, can be overridden */
+  border-radius: 50%; /* Makes the container round */
+  overflow: hidden; /* Clips the image to the round shape */
+  margin-bottom: 15px; /* Example spacing below the avatar */
+  border: 3px solid #007bff; /* Example border color (e.g., primary theme color) */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Example subtle shadow */
+  flex-shrink: 0; /* Prevent shrinking in flex containers */
+}
+
+.avatar-image {
+  width: 100%; /* Image takes the full width of the container */
+  height: 100%; /* Image takes the full height of the container */
+  object-fit: cover; /* Ensures the image covers the area without distortion, cropping if necessary */
+  display: block; /* Remove any extra space below the image */
+}
+
+/* Optional: Modifier classes for different sizes if needed */
+/*
+.avatar-container.avatar-small {
+    width: 40px;
+    height: 40px;
+    border-width: 2px;
+}
+
+.avatar-container.avatar-medium {
+    width: 60px;
+    height: 60px;
+    border-width: 3px;
+}
+*/

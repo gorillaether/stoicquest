@@ -1,0 +1,27 @@
+/* src/components/ui/ProgressBar.css */
+.progress-bar-container {
+  width: 100%; /* Default width, can be overridden by parent or className */
+  height: 20px; /* Default height, adjust as needed */
+  background-color: #e0e0e0; /* Background color for the empty part of the bar */
+  border-radius: 10px; /* Rounded corners */
+  overflow: hidden; /* Ensure the fill doesn't go outside the rounded corners */
+  margin: 5px 0; /* Example vertical margin */
+}
+
+.progress-bar-fill {
+  height: 100%; /* Make the fill div take the full height of the container */
+  background-color: #28a745; /* Green color for the progress fill (example) */
+  transition: width 0.5s ease-in-out; /* Smooth animation when the percentage changes */
+  /* The width is controlled by the inline style in the JSX */
+}
+
+/* Optional: Different colors for different contexts */
+/*
+.progress-bar-container.level-progress .progress-bar-fill {
+    background-color: #007bff; // Blue for level progress
+}
+
+.progress-bar-container.chapter-progress .progress-bar-fill {
+    background-color: #ffc107; // Yellow for chapter progress
+}
+*/
