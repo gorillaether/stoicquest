@@ -1,392 +1,406 @@
-// src/hooks/useGameProgress.js // <-- This is the file name the error is in
-// Custom hook for managing user progression state via UserContext
+// src/hooks/useGameProgress.js
 
-import { useContext, useCallback, useEffect } from 'react'; // Added useEffect
-import { useUser } from '../contexts/UserContext'; // Import useUser hook
-// GameContext is not directly needed for updating user state, but could be used to get current chapter ID if needed
-// import { useGame } from '../contexts/GameContext';
-import { calculateLevel } from '../utils/levelUtils'; // Import level calculation utility
-import { getChapterById } from '../data/chapters'; // Import to check chapter structure for section completion
+import { useCallback, useEffect } from 'react';
+import { useUser } from '../contexts/UserContext'; // Your existing UserContext
+import { getChapterById } from '../data/chapters';
 
-/**
- * Custom hook to manage and update user-specific progression data
- * stored in UserContext.
- * @returns {Object} - Methods for updating and tracking user progress.
- */
-const useGameProgress = () => { // <-- The hook function name
-  const { user, updateUser } = useUser(); // Get user state and updater from UserContext
-  // const { currentChapterId } = useGame(); // Example: If needed to get the current chapter ID
+// --- Firebase Imports ---
+// Ensure this path is correct based on your project structure
+import { db, auth } from '../firebase'; // Or '../firebase.js'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
-  /**
-   * Marks a section within a chapter as completed/read.
-   * @param {string} chapterId - The ID of the chapter.
-   * @param {string} sectionId - The ID of the section.
-   */
-  const completeSection = useCallback((chapterId, sectionId) => {
-    // Get the current progress for the chapter, or initialize it
-    const chapterProgress = user.progress?.chapters?.[chapterId] || {
-        isUnlocked: false, // Should be unlocked to complete sections, but initialize defensively
-        isStarted: true,
-        isCompleted: false,
-        completedSections: [],
-        challengeCompletions: {}, // Use challengeCompletions object
-        reflections: {},
-        lastVisited: new Date().toISOString()
+// --- Configuration for NFT Mint Request ---
+// Replace with your actual deployed Cloud Function URL
+const REQUEST_MINT_FUNCTION_URL = "https://us-central1-stoic-quest.cloudfunctions.net/requestNftMint";
+
+// Define Avatar Stages Enum (consistent with your Cloud Function and game logic)
+const AVATAR_STAGES_ENUM = {
+  Novice: 0,
+  Apprentice: 1, // Example: Awarded for completing Chapter 5
+  Practitioner: 2,
+  Scholar: 3,
+  Sage: 4,
+  Epictetus: 5,
+};
+
+// Helper function to call your Cloud Function
+async function logMintRequest(walletAddress, stageToMint, stageName, reason) {
+  if (!walletAddress) {
+    console.warn("[logMintRequest] No wallet address provided. Cannot log mint request.");
+    return { success: false, error: "No wallet address." };
+  }
+  if (!REQUEST_MINT_FUNCTION_URL) {
+    console.error("[logMintRequest] REQUEST_MINT_FUNCTION_URL is not defined!");
+    return { success: false, error: "Mint request URL is not configured." };
+  }
+
+  try {
+    const response = await fetch(REQUEST_MINT_FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ walletAddress, stageToMint, stageName, reason }),
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      console.error(
+        "[logMintRequest] Error logging mint request. Status:",
+        response.status,
+        "Response:", responseData
+      );
+      return { success: false, error: responseData.message || responseData.error || "Failed to log request." };
+    }
+
+    console.log("[logMintRequest] Mint request logged successfully:", responseData);
+    return { success: true, data: responseData };
+  } catch (error) {
+    console.error("[logMintRequest] Network or other error logging mint request:", error);
+    return { success: false, error: error.message || "Network error." };
+  }
+}
+
+// Helper function to provide a complete default structure for a chapter's progress
+const getDefaultChapterProgressStructure = (chapterId) => ({
+  isUnlocked: chapterId === '1',
+  isStarted: false,
+  isCompleted: false,
+  completedSections: [],
+  challengeCompletions: {},
+  reflections: {}, // This will still be updated locally for optimistic UI / local cache
+  lastReadSection: 0,
+  lastVisited: null,
+  unlockedAt: chapterId === '1' ? new Date().toISOString() : null,
+});
+
+const useGameProgress = () => {
+  const { user: userDataFromContext, updateUser, walletAddress } = useUser();
+
+  const completeSection = useCallback(async (chapterId, sectionId) => {
+    console.log(`[useGameProgress] completeSection called. ChapterID: ${chapterId}, SectionID: ${sectionId}`);
+    if (!userDataFromContext || typeof userDataFromContext.progress !== 'object') {
+        console.warn("[useGameProgress] userDataFromContext or userDataFromContext.progress not available or not an object in completeSection. Current userDataFromContext:", userDataFromContext);
+        return { xpEarned: 0, isChapterCompleted: false };
+    }
+
+    const persistedChapterProgress = userDataFromContext.progress?.chapters?.[chapterId];
+    let chapterProgress = {
+      ...(getDefaultChapterProgressStructure(chapterId)),
+      ...(persistedChapterProgress || {}),
+      isStarted: true,
+      lastVisited: new Date().toISOString(),
     };
+    if (chapterId === '1') {
+        chapterProgress.isUnlocked = true;
+    }
 
-    // Check if the section is already completed
     const isSectionAlreadyCompleted = chapterProgress.completedSections.includes(sectionId);
-
     let xpEarned = 0;
     let updatedCompletedSections = [...chapterProgress.completedSections];
-    let isChapterCompleted = chapterProgress.isCompleted;
+    let isChapterActuallyCompleted = chapterProgress.isCompleted;
 
     if (!isSectionAlreadyCompleted) {
         updatedCompletedSections.push(sectionId);
-        xpEarned += 5; // Example: Award XP for completing a section
-
-        // Optional: Check if all sections in the chapter are now completed
+        xpEarned += 5;
         const chapterData = getChapterById(chapterId);
         if (chapterData && updatedCompletedSections.length === chapterData.sections.length) {
-             isChapterCompleted = true; // Mark chapter as completed if all sections are done
-             xpEarned += 20; // Example: Bonus XP for completing all sections in a chapter
-              // Logic to unlock the next chapter could be triggered here or elsewhere
-              // based on chapter completion.
+             isChapterActuallyCompleted = true;
+             xpEarned += 20;
+             if (chapterId === '5' && isChapterActuallyCompleted) {
+                console.log(`[useGameProgress] Chapter 5 completed! User with wallet ${walletAddress} eligible for Apprentice NFT.`);
+                if (walletAddress) {
+                    await logMintRequest(
+                        walletAddress,
+                        AVATAR_STAGES_ENUM.Apprentice,
+                        "Apprentice",
+                        "Completed Chapter 5: Disturbances of the Mind"
+                    );
+                } else {
+                    console.warn("[useGameProgress] Chapter 5 completed, but no wallet address is currently connected. Cannot request Apprentice NFT mint.");
+                }
+             }
         }
     }
 
-     // Update user state via updateUser
-     updateUser({
-        xp: user.xp + xpEarned, // Add earned XP
-        progress: {
-            ...user.progress,
-            chapters: {
-                ...user.progress?.chapters,
-                [chapterId]: {
-                    ...chapterProgress,
-                    completedSections: updatedCompletedSections,
-                    isCompleted: isChapterCompleted,
-                    lastVisited: new Date().toISOString() // Update last visited time
+    const chapterDataForSectionIndex = getChapterById(chapterId);
+    const currentSectionIndex = chapterDataForSectionIndex?.sections.findIndex(s => s.id === sectionId) ?? -1;
+    if (currentSectionIndex > (chapterProgress.lastReadSection ?? -1)) {
+        chapterProgress.lastReadSection = currentSectionIndex;
+    }
+
+    if (xpEarned > 0 || !isSectionAlreadyCompleted) {
+         updateUser({
+            xp: (userDataFromContext.xp || 0) + xpEarned,
+            progress: {
+                ...userDataFromContext.progress,
+                chapters: {
+                    ...(userDataFromContext.progress?.chapters),
+                    [chapterId]: {
+                        ...chapterProgress,
+                        completedSections: updatedCompletedSections,
+                        isCompleted: isChapterActuallyCompleted,
+                    }
                 }
             }
-        }
-     });
+         });
+    }
+     return { xpEarned, isChapterCompleted: isChapterActuallyCompleted };
+  }, [userDataFromContext, updateUser, walletAddress]);
 
-     // Note: Achievement checks should ideally happen AFTER user state is updated
-     // An effect in UserContext watching relevant stats or a separate hook could do this.
-
-     // Return results for immediate feedback if needed
-     return { xpEarned, isChapterCompleted: isChapterCompleted };
-
-  }, [user, updateUser]); // Depend on user and updateUser
-
-
-  /**
-   * Marks a challenge within a chapter as completed.
-   * @param {string} chapterId - The ID of the chapter.
-   * @param {string} challengeId - The ID of the challenge.
-   * @param {number} [score=100] - Optional score achieved (0-100).
-   * @param {any} [details] - Optional details about the challenge completion (e.g., answers).
-   */
-  const completeChallenge = useCallback((chapterId, challengeId, score = 100, details = null) => {
-    // Get the current progress for the chapter, or initialize it
-     const chapterProgress = user.progress?.chapters?.[chapterId] || {
-        isUnlocked: false,
-        isStarted: true,
-        isCompleted: false,
-        completedSections: [],
-        challengeCompletions: {},
-        reflections: {},
-        lastVisited: new Date().toISOString()
+  const completeChallenge = useCallback(async (chapterId, challengeId, xpToAward, details = null) => {
+    if (!userDataFromContext || typeof userDataFromContext.progress !== 'object') {
+        console.warn("[useGameProgress] userDataFromContext or userDataFromContext.progress not available in completeChallenge.");
+        return { xpEarned: 0, isFirstCompletion: false };
+    }
+    const persistedChapterProgress = userDataFromContext.progress?.chapters?.[chapterId];
+    let chapterProgress = {
+      ...(getDefaultChapterProgressStructure(chapterId)),
+      ...(persistedChapterProgress || {}),
+      isStarted: true,
+      lastVisited: new Date().toISOString(),
     };
-
-    // Check if the challenge has been completed before for scoring/XP
-    const challengeKey = challengeId; // Use challenge ID directly as key
-    const hasCompletedBefore = chapterProgress.challengeCompletions[challengeKey] !== undefined;
-
-    let xpEarned = 0;
-    let updatedChallengeCompletions = { ...chapterProgress.challengeCompletions };
-    let totalChallengesCompletedCount = user.challengesCompleted || 0; // Get overall count
-
-    // Only award base XP for the first successful completion
-    if (!hasCompletedBefore) {
-       // Example: Award XP based on a base value or challenge data (need to fetch challenge data)
-       // For now, use a fixed value or base it on score as in original hook
-        xpEarned += Math.round(30 * (score / 100)); // Example base XP 30
-
-        // Increment the overall count of completed challenges
-        totalChallengesCompletedCount += 1;
-    } else {
-        // If re-completing, perhaps award a smaller amount of XP or none
-         // xpEarned += Math.round(10 * (score / 100)); // Example: smaller XP for re-completion
+    if (chapterId === '1') {
+        chapterProgress.isUnlocked = true;
     }
 
-    // Store completion details (always update with the latest completion details)
+    const challengeKey = challengeId;
+    const hasCompletedBefore = chapterProgress.challengeCompletions[challengeKey] !== undefined;
+    let xpEarnedThisTime = 0;
+    let updatedChallengeCompletions = { ...chapterProgress.challengeCompletions };
+    let totalChallengesCompletedCount = userDataFromContext.challengesCompleted || 0;
+
+    if (!hasCompletedBefore) {
+        xpEarnedThisTime = xpToAward;
+        totalChallengesCompletedCount += 1;
+    }
     updatedChallengeCompletions[challengeKey] = {
         completedAt: new Date().toISOString(),
-        score: score,
         details: details
     };
 
-    // Update user state via updateUser
-     updateUser({
-        xp: user.xp + xpEarned, // Add earned XP
-        challengesCompleted: totalChallengesCompletedCount, // Update overall count
-        progress: {
-            ...user.progress,
-            chapters: {
-                ...user.progress?.chapters,
-                [chapterId]: {
-                    ...chapterProgress,
-                    challengeCompletions: updatedChallengeCompletions,
-                    lastVisited: new Date().toISOString() // Update last visited time
-                }
-            }
-        },
-        // Streak update logic would also be here or in a separate daily check
-        // lastLogin and streak updates are in UserContext's useEffect based on lastLogin
-     });
+    if (xpEarnedThisTime > 0 || !hasCompletedBefore) {
+        updateUser({
+            xp: (userDataFromContext.xp || 0) + xpEarnedThisTime,
+            challengesCompleted: totalChallengesCompletedCount,
+            progress: {
+                ...userDataFromContext.progress,
+                chapters: {
+                    ...(userDataFromContext.progress?.chapters),
+                    [chapterId]: {
+                        ...chapterProgress,
+                        challengeCompletions: updatedChallengeCompletions,
+                    }
+                },
+            },
+        });
+    } else if (hasCompletedBefore && JSON.stringify(details) !== JSON.stringify(chapterProgress.challengeCompletions[challengeKey]?.details)) {
+         updateUser({
+            progress: {
+                ...userDataFromContext.progress,
+                chapters: {
+                    ...(userDataFromContext.progress?.chapters),
+                    [chapterId]: {
+                        ...chapterProgress,
+                        challengeCompletions: updatedChallengeCompletions,
+                    }
+                },
+            },
+        });
+    }
+    return { xpEarned: xpEarnedThisTime, isFirstCompletion: !hasCompletedBefore };
+  }, [userDataFromContext, updateUser, walletAddress]);
 
-     // Note: Achievement checks should ideally happen AFTER user state is updated.
-     // E.g., check for streak achievement, total challenges completed achievement,
-     // chapter completion achievement (if completing all challenges completes chapter).
+  const saveReflection = useCallback(async (chapterId, reflectionId, content) => {
+    console.log(`[useGameProgress] saveReflection CALLED. ChapterID: ${chapterId}, ReflectionID (SectionID): ${reflectionId}, Content Length:`, content?.length);
 
-     // Return results for immediate feedback if needed
-     return { xpEarned, isFirstCompletion: !hasCompletedBefore };
+    // --- Firestore Integration for Saving Reflection ---
+    const currentUser = auth.currentUser; // Get the currently authenticated Firebase user
 
-  }, [user, updateUser]); // Depend on user and updateUser
-
-
-  /**
-   * Saves a user's reflection for a specific chapter/section.
-   * @param {string} chapterId - The ID of the chapter.
-   * @param {string} reflectionId - A unique ID for the reflection (e.g., section ID or challenge ID).
-   * @param {string} content - The reflection text content.
-   */
-  const saveReflection = useCallback((chapterId, reflectionId, content) => {
-     // Get the current progress for the chapter, or initialize it
-     const chapterProgress = user.progress?.chapters?.[chapterId] || {
-        isUnlocked: false,
-        isStarted: true,
-        isCompleted: false,
-        completedSections: [],
-        challengeCompletions: {},
-        reflections: {},
-        lastVisited: new Date().toISOString()
-    };
-
-    const reflectionKey = reflectionId; // Use reflection ID as key
-    const hasReflectedBefore = chapterProgress.reflections[reflectionKey] !== undefined;
-
-    let xpEarned = 0;
-    let updatedReflections = { ...chapterProgress.reflections };
-    let totalReflectionsWrittenCount = user.reflectionsWritten || 0; // Get overall count
-
-
-    // Award XP only for the first time saving a reflection for this ID
-    if (!hasReflectedBefore) {
-        xpEarned += 10; // Example: Award XP for a new reflection
-        totalReflectionsWrittenCount += 1; // Increment overall count
+    if (!currentUser) {
+      console.warn("[useGameProgress] No Firebase user authenticated. Reflection will not be saved to Firestore. User needs to sign in via Firebase Auth.");
     } else {
-        // Optional: Award a tiny bit of XP for updating a reflection?
-        // xpEarned += 1; // Example: Small XP for updates
+      // User is authenticated with Firebase, proceed to save to Firestore.
+      const reflectionDataForFirestore = {
+        // userId: currentUser.uid, // Not strictly needed in document if path is users/{userId}/reflections
+        walletAddress: walletAddress || null,
+        chapterId: chapterId,
+        reflectionSectionId: reflectionId, // This is your existing 'reflectionId' argument
+        content: content,
+        createdAt: serverTimestamp(),
+      };
+
+      try {
+        // Path: users/{userId}/reflections/{autoGeneratedId}
+        const userReflectionsCollection = collection(db, 'users', currentUser.uid, 'reflections');
+        const docRef = await addDoc(userReflectionsCollection, reflectionDataForFirestore);
+        console.log(`[useGameProgress] Reflection saved to Firestore for user ${currentUser.uid} with new doc ID: ${docRef.id}`);
+      } catch (error) {
+        console.error("[useGameProgress] Error saving reflection to Firestore:", error);
+        // Potentially provide user feedback about cloud save failure
+      }
+    }
+    // --- END: Firestore Integration ---
+
+    // --- Existing LocalStorage/UserContext update logic (for optimistic UI / local cache) ---
+    if (!userDataFromContext || typeof userDataFromContext.progress !== 'object') {
+        console.warn("[useGameProgress] userDataFromContext or userDataFromContext.progress not available in saveReflection (local update part).");
+        return { xpEarned: 0, isFirstReflection: false };
     }
 
-     // Store the reflection content and timestamp (always update with the latest)
+    const persistedChapterProgress = userDataFromContext.progress?.chapters?.[chapterId];
+    let chapterProgress = {
+      ...(getDefaultChapterProgressStructure(chapterId)),
+      ...(persistedChapterProgress || {}),
+      isStarted: true,
+      lastVisited: new Date().toISOString(),
+    };
+    if (chapterId === '1') {
+        chapterProgress.isUnlocked = true;
+    }
+
+    const reflectionKey = reflectionId;
+    const previousReflectionData = chapterProgress.reflections[reflectionKey];
+    const hasReflectedBefore = previousReflectionData !== undefined; // Based on local cache
+    let xpEarned = 0;
+    let updatedReflections = { ...chapterProgress.reflections };
+    let totalReflectionsWrittenCount = userDataFromContext.reflectionsWritten || 0;
+
+    if (!hasReflectedBefore) {
+        xpEarned += 10; // Award XP for the first reflection (based on local cache)
+        totalReflectionsWrittenCount += 1;
+    }
+
     updatedReflections[reflectionKey] = {
         content: content,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString() // Local timestamp for local cache
     };
 
-
-     // Update user state via updateUser
-     updateUser({
-        xp: user.xp + xpEarned, // Add earned XP
-        reflectionsWritten: totalReflectionsWrittenCount, // Update overall count
-        progress: {
-            ...user.progress,
-            chapters: {
-                ...user.progress?.chapters,
-                [chapterId]: {
-                    ...chapterProgress,
-                    reflections: updatedReflections,
-                     lastVisited: new Date().toISOString() // Update last visited time
+    // This updateUser updates your UserContext (likely still localStorage backed)
+    if (xpEarned > 0 || !hasReflectedBefore || (hasReflectedBefore && previousReflectionData.content !== content) ) {
+        updateUser({
+            xp: (userDataFromContext.xp || 0) + xpEarned,
+            reflectionsWritten: totalReflectionsWrittenCount,
+            progress: {
+                ...userDataFromContext.progress,
+                chapters: {
+                    ...(userDataFromContext.progress?.chapters),
+                    [chapterId]: {
+                        ...chapterProgress,
+                        reflections: updatedReflections, // Update local cache
+                    }
                 }
             }
-        },
-        // Streak update logic might consider reflections too, depends on game design
-     });
+        });
+        console.log(`[useGameProgress] updateUser (to LocalContext/LocalStorage) called after saveReflection for section ${reflectionId}.`);
+    }
+    return { xpEarned, isFirstReflection: !hasReflectedBefore };
+  }, [userDataFromContext, updateUser, walletAddress]);
 
-     // Note: Achievement checks (e.g., total reflections, reflection streak)
-     // should ideally happen AFTER user state is updated.
-
-     // Return results for immediate feedback if needed
-     return { xpEarned, isFirstReflection: !hasReflectedBefore };
-
-  }, [user, updateUser]); // Depend on user and updateUser
-
-
-   /**
-    * Unlocks a specific chapter for the user.
-    * @param {string} chapterId - The ID of the chapter to unlock.
-    */
-   const unlockChapter = useCallback((chapterId) => {
-       // Check if the chapter exists in the user's progress and is not already unlocked
-       const chapterProgress = user.progress?.chapters?.[chapterId];
-
-       if (chapterProgress && !chapterProgress.isUnlocked) {
-           updateUser({
-               progress: {
-                   ...user.progress,
-                   chapters: {
-                       ...user.progress?.chapters,
-                       [chapterId]: {
-                           ...chapterProgress,
-                           isUnlocked: true,
-                           unlockedAt: new Date().toISOString() // Record unlock time
-                       }
-                   }
-               }
-           });
-           console.log(`Chapter unlocked: ${chapterId}`);
-            // Optional: Trigger achievement for unlocking chapters count
-       } else if (!chapterProgress) {
-            console.warn(`Attempted to unlock chapter ${chapterId}, but it was not found in user progress. Initializing it.`);
-            // Initialize chapter progress if it doesn't exist (e.g., for first chapter unlock)
-             updateUser({
-               progress: {
-                   ...user.progress,
-                   chapters: {
-                       ...user.progress?.chapters,
-                       [chapterId]: {
-                           isUnlocked: true,
-                           isStarted: false,
-                           isCompleted: false,
-                           completedSections: [],
-                           challengeCompletions: {},
-                           reflections: {},
-                           lastVisited: null,
-                           unlockedAt: new Date().toISOString()
-                       }
-                   }
-               }
-           });
-            console.log(`Chapter unlocked and initialized: ${chapterId}`);
-       } else {
-           console.log(`Chapter ${chapterId} is already unlocked.`);
-       }
-   }, [user, updateUser]);
-
-
-  /**
-   * Checks if a section within a chapter has been completed.
-   * @param {string} chapterId - The ID of the chapter.
-   * @param {string} sectionId - The ID of the section.
-   * @returns {boolean} - True if the section is completed, false otherwise.
-   */
-  const isSectionCompleted = useCallback((chapterId, sectionId) => {
-    return user.progress?.chapters?.[chapterId]?.completedSections?.includes(sectionId) || false;
-  }, [user.progress]);
-
-
-  /**
-   * Checks if a challenge within a chapter has been completed.
-   * @param {string} chapterId - The ID of the chapter.
-   * @param {string} challengeId - The ID of the challenge.
-   * @returns {boolean} - True if the challenge has been completed, false otherwise.
-   */
-  const isChallengeCompleted = useCallback((chapterId, challengeId) => {
-    return user.progress?.chapters?.[chapterId]?.challengeCompletions?.[challengeId] !== undefined || false;
-  }, [user.progress]);
-
-   /**
-    * Gets the completion details for a challenge.
-    * @param {string} chapterId - The ID of the chapter.
-    * @param {string} challengeId - The ID of the challenge.
-    * @returns {Object|null} - Completion details object or null if not completed.
-    */
-   const getChallengeCompletionDetails = useCallback((chapterId, challengeId) => {
-       return user.progress?.chapters?.[chapterId]?.challengeCompletions?.[challengeId] || null;
-   }, [user.progress]);
-
-
-  /**
-   * Gets the user's reflection for a specific ID.
-   * @param {string} chapterId - The ID of the chapter the reflection is associated with.
-   * @param {string} reflectionId - The unique ID for the reflection (e.g., section ID or challenge ID).
-   * @returns {Object|null} - Reflection data object (with text and timestamp) or null if not saved.
-   */
-  const getReflection = useCallback((chapterId, reflectionId) => {
-     return user.progress?.chapters?.[chapterId]?.reflections?.[reflectionId] || null;
-  }, [user.progress]);
-
-  /**
-   * Gets the user's progress data for a specific chapter.
-   * @param {string} chapterId - The ID of the chapter.
-   * @returns {Object} - Chapter progress object or a default uninitiated object.
-   */
-  const getChapterProgress = useCallback((chapterId) => {
-    return user.progress?.chapters?.[chapterId] || {
-      isUnlocked: false,
-      isStarted: false,
-      isCompleted: false,
-      completedSections: [],
-      challengeCompletions: {},
-      reflections: {},
-      lastVisited: null
+  const unlockChapter = useCallback((chapterId) => {
+    if (!userDataFromContext || typeof userDataFromContext.progress !== 'object') {
+        console.warn("[useGameProgress] userDataFromContext or userDataFromContext.progress not available in unlockChapter.");
+        return;
+    }
+    const currentChapterDataFromApp = getChapterById(chapterId);
+    if (!currentChapterDataFromApp) {
+        console.error(`[useGameProgress] unlockChapter: No chapter data found for ID ${chapterId}.`);
+        return;
+    }
+    const persistedChapterProgress = userDataFromContext.progress?.chapters?.[chapterId];
+    let chapterProgressToUpdate = {
+        ...(getDefaultChapterProgressStructure(chapterId)),
+        ...(persistedChapterProgress || {}),
     };
-  }, [user.progress]);
 
-  /**
-   * Gets overall game progress statistics based on user data.
-   * @returns {Object} - Overall progress statistics.
-   */
+    if (!chapterProgressToUpdate.isUnlocked) {
+        chapterProgressToUpdate.isUnlocked = true;
+        chapterProgressToUpdate.unlockedAt = new Date().toISOString();
+        updateUser({
+            progress: {
+                ...userDataFromContext.progress,
+                chapters: {
+                    ...(userDataFromContext.progress?.chapters),
+                    [chapterId]: chapterProgressToUpdate
+                }
+            }
+        });
+    }
+  }, [userDataFromContext, updateUser]);
+
+  const isSectionCompleted = useCallback((chapterId, sectionId) => {
+    return userDataFromContext?.progress?.chapters?.[chapterId]?.completedSections?.includes(sectionId) || false;
+  }, [userDataFromContext]);
+
+  const isChallengeCompleted = useCallback((chapterId, challengeId) => {
+    return userDataFromContext?.progress?.chapters?.[chapterId]?.challengeCompletions?.[challengeId] !== undefined || false;
+  }, [userDataFromContext]);
+
+  const getChallengeCompletionDetails = useCallback((chapterId, challengeId) => {
+    return userDataFromContext?.progress?.chapters?.[chapterId]?.challengeCompletions?.[challengeId] || null;
+  }, [userDataFromContext]);
+
+  const getReflection = useCallback((chapterId, reflectionId) => {
+    // This still reads from the local UserContext cache.
+    // To read the canonical version from Firestore, this function would need to become async
+    // and query Firestore, or you would use the new useUserReflections hook for display.
+    console.warn("[useGameProgress] getReflection is currently reading from local cache, not Firestore directly.");
+    return userDataFromContext?.progress?.chapters?.[chapterId]?.reflections?.[reflectionId] || null;
+  }, [userDataFromContext]);
+
+  const getChapterProgress = useCallback((chapterId) => {
+    const persistedChapterProgress = userDataFromContext?.progress?.chapters?.[chapterId];
+    let fullProgress = {
+        ...(getDefaultChapterProgressStructure(chapterId)),
+        ...(persistedChapterProgress || {}),
+    };
+    if (chapterId === '1') {
+        fullProgress.isUnlocked = true;
+        if (!fullProgress.unlockedAt) {
+             fullProgress.unlockedAt = new Date().toISOString();
+        }
+    }
+    return fullProgress;
+  }, [userDataFromContext]);
+
   const getOverallProgress = useCallback(() => {
-    const totalChaptersAvailable = Object.keys(user.progress?.chapters || {}).length; // Or get from chapters.js
-     const completedChaptersCount = Object.values(user.progress?.chapters || {})
-       .filter(chapter => chapter.isCompleted).length;
-
-    // Use the top-level counts from user state
-    const totalChallengesCompleted = user.challengesCompleted || 0;
-    const totalReflectionsWritten = user.reflectionsWritten || 0;
-    const currentStreak = user.streak || 0;
-
-
+    const chaptersProgress = userDataFromContext?.progress?.chapters || {};
+    const totalChaptersKnownToUser = Object.keys(chaptersProgress).length;
+    const completedChaptersCount = Object.values(chaptersProgress).filter(chapter => chapter.isCompleted).length;
+    const totalChallengesCompleted = userDataFromContext?.challengesCompleted || 0;
+    const totalReflectionsWritten = userDataFromContext?.reflectionsWritten || 0;
+    const currentStreak = userDataFromContext?.streak || 0;
     return {
       completedChaptersCount,
-      totalChaptersAvailable, // How many chapters the user's progress object knows about
+      totalChaptersAvailable: totalChaptersKnownToUser, // This might be better sourced from `getChapters().length`
       totalChallengesCompleted,
       totalReflectionsWritten,
       currentStreak,
-      currentLevel: user.level, // Get from user state
-      currentXP: user.xp // Get from user state
+      currentLevel: userDataFromContext?.level || 1,
+      currentXP: userDataFromContext?.xp || 0
     };
-  }, [user]); // Depend on user state for overall progress
+  }, [userDataFromContext]);
 
-
-  // Initial check to unlock the first chapter if it's a new user
   useEffect(() => {
-      if (user && !user.progress?.chapters?.['1']?.isUnlocked) {
-          console.log("Initializing and unlocking first chapter...");
-          unlockChapter('1'); // Unlock chapter with ID '1'
+      if (userDataFromContext && userDataFromContext.progress) {
+          const chapter1Progress = userDataFromContext.progress.chapters?.['1'];
+          if (!chapter1Progress || !chapter1Progress.isUnlocked) {
+              unlockChapter('1');
+          }
       }
-  }, [user, unlockChapter]); // Depend on user object and unlockChapter
-
+  }, [userDataFromContext, unlockChapter]); // unlockChapter is memoized with useCallback
 
   return {
     completeSection,
     completeChallenge,
     saveReflection,
-    unlockChapter, // Expose unlockChapter if needed elsewhere
+    unlockChapter,
     isSectionCompleted,
     isChallengeCompleted,
     getChallengeCompletionDetails,
     getReflection,
     getChapterProgress,
     getOverallProgress,
-     // Expose user stats directly if preferred, but using getters or accessing user from useUser() is also fine
-     // userStats: { xp: user.xp, level: user.level, streak: user.streak, ... }
   };
 };
 
-export default useGameProgress; // <-- Exporting useGameProgress to match the file name
+export default useGameProgress;

@@ -1,0 +1,39 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Match any document in the 'users' collection
+    match /users/{userId}/{document=**} {
+      // Allow a user to read and write to any document within their own user-specific path
+      // This is a broad rule for a user's own documents.
+      // You might want to make it more specific if you have other subcollections under /users/{userId}/
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Specifically for the reflections subcollection (more granular and often preferred)
+    // This rule would allow a logged-in user to read and write reflections
+    // only within their own 'reflections' subcollection.
+    match /users/{userId}/reflections/{reflectionId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // IMPORTANT: If you have other collections, you'll need to add rules for them too.
+    // Any path not explicitly matched by a rule above will fall back to being denied
+    // if you remove the overly restrictive global deny rule.
+    // For now, to make sure nothing else is accessible until you define rules for it,
+    // you can keep a default deny at the end, but it's better to explicitly define
+    // rules for all paths you intend to use.
+
+    // Example: if you had a 'chaptersPublicData' collection that anyone could read:
+    // match /chaptersPublicData/{chapterDocId} {
+    //   allow read: if true;
+    //   allow write: if false; // No one can write to public chapter data from client
+    // }
+
+    // It's good practice to ensure no paths are unintentionally left open or closed.
+    // The rule you had: "match /{document=**} { allow read, write: if false; }"
+    // can be removed once you have more specific rules. If a path is not matched by any
+    // 'allow' rule, it is implicitly denied.
+  }
+}

@@ -1,18 +1,129 @@
-/* src/pages/Profile.css */
-.profile-page-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh; /* Ensure the container takes at least the full viewport height */
-  font-family: sans-serif; /* Example font */
-  background-color: #f4f4f4; /* Example background color */
-}
-
-.profile-page-content {
-  flex: 1; /* Allows the content area to grow */
+/* src/components/user/Profile.css */
+.profile-container {
   padding: 20px;
-  max-width: 800px; /* Max width for the profile content */
-  margin: 0 auto; /* Center the content */
-  width: 100%; /* Ensure it takes full width up to max-width */
+  font-family: sans-serif; /* Example font */
 }
 
-/* Styles for the UserProfileComponent itself are in src/components/user/Profile.css */
+.profile-title {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #eee; /* Separator */
+  padding-bottom: 10px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee; /* Separator */
+}
+
+/* Styles for the Avatar component within the profile header are handled in Avatar.css */
+/* .profile-header .avatar-container { ... } */
+
+
+.profile-basic-info p {
+  margin: 5px 0;
+  color: #555;
+  font-size: 1rem;
+}
+
+.profile-basic-info strong {
+  color: #333;
+}
+
+/* Styles for the Inventory component within the profile are handled in Inventory.css */
+/* .profile-container .inventory-container { ... } */
+
+
+.profile-avatars-section {
+    margin-top: 30px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
+.profile-section-title {
+    font-size: 1.4rem;
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.owned-avatars-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* Space between avatar items */
+    margin: 0;
+}
+
+.owned-avatar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #eee;
+    font-size: 0.85rem;
+    color: #555;
+    width: 100px; /* Give item a fixed width to contain thumbnail and text */
+    text-align: center;
+}
+
+/* Styles for the thumbnails in the "Your Avatar Collection" list */
+.owned-nft-thumbnail { /* <<< RENAMED from .owned-avatar-thumbnail */
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #ccc;
+}
+
+.profile-empty-state {
+    font-style: italic;
+    color: #777;
+    text-align: center;
+    width: 100%; /* Ensure it takes full width if list is empty */
+    padding: 20px 0;
+}
+
+.next-avatar-preview {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px dashed #ccc;
+}
+
+.next-avatar-title { /* This class was not in your HTML, but if you use it, here are styles */
+     font-size: 1.2rem;
+     color: #333;
+     margin-bottom: 10px;
+}
+
+.next-avatar-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Styles for the thumbnail in the "Next Avatar Preview" section */
+.next-avatar-thumbnail {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #007bff; /* Example highlight border */
+}
+
+.next-avatar-info p {
+    margin: 0;
+    color: #555;
+    font-size: 1rem;
+}

@@ -4,22 +4,96 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f9f9f9;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  /* Background image from Pinata for the entire page - REMAINS UNCHANGED */
+  background-image: url('https://aqua-gigantic-haddock-37.mypinata.cloud/ipfs/bafybeiasicds2xgit2qwhc4gyxh7qxof2ajh5f4ls7nqwpjmhpzwtdbyoy');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .game-content {
   flex: 1;
   padding: 2rem;
   margin-left: 250px; /* if Sidebar is fixed */
-  background-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.85); /* semi-transparent for readability */
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+}
+
+/* Styles for the IPFS video area */
+.ipfs-video-area {
+  /* Inline styles from your HTML for padding (20px), text-align (center), and
+     background-color (rgb(233, 236, 239)) will still apply.
+     The CSS background-image will be layered on top of the inline background-color. */
+
+  /* === REPLACE THIS URL with your actual NEW JPEG background image link === */
+  background-image: url('YOUR_NEW_JPEG_BACKGROUND_IMAGE_URL_HERE');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 8px; /* Optional: consistent rounded corners */
+  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */ /* Optional: subtle shadow for depth */
+
+  /* --- STYLES FOR RIGHT ALIGNMENT ON LARGER SCREENS --- */
+  /* Set a max-width for the video area block. Adjust as needed.
+     This allows margin-left: auto to push it right.
+     e.g., 720px (video max-width) + 40px (inline padding) + some buffer = ~780px */
+  max-width: 780px;
+  width: auto; /* Allow it to shrink if content is smaller, up to max-width */
+  margin-left: auto;  /* Pushes the block to the right within its container (.game-content) */
+  margin-right: 0;     /* Or a specific margin like '1rem' or '2rem' if you don't want it flush against the right edge */
+  /* The inline text-align: center will center H2, P, and VIDEO (if inline-block) WITHIN this block */
+}
+
+/* Styling for the text within the video area to ensure readability */
+.ipfs-video-area h2,
+.ipfs-video-area p {
+  position: relative;
+  z-index: 1; /* Ensure text is above the background image */
+  /* Optional: Add text shadow for better contrast if needed */
+  /* text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); */
+  /* Optional: Change text color if needed */
+  /* color: #FFFFFF; */
+}
+
+/* Styling for the video player itself within the video area */
+.ipfs-video-area video {
+  position: relative;
+  z-index: 1; /* Ensure video is above the background image */
+  display: block; /* Ensures margin auto works for centering */
+  width: 80%; /* Default width, consistent with original HTML attribute. Overridden for small screens. */
+  /* The inline style max-width: 720px on the video tag will still apply as an upper limit. */
+  margin-left: auto;  /* Centers the video block within .ipfs-video-area */
+  margin-right: auto; /* Centers the video block within .ipfs-video-area */
+  border: 1px solid rgba(0,0,0,0.1); /* Subtle border */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15); /* Subtle shadow to lift the video */
+  border-radius: 4px; /* Optional: rounded corners for the video player */
 }
 
 @media (max-width: 768px) {
   .game-content {
-    margin-left: 0;
-    padding: 1rem;
+    margin-left: 0; /* Sidebar space removed */
+    padding: 1rem;  /* Adjust padding for .game-content */
+  }
+
+  .ipfs-video-area {
+    /* --- ADJUST VIDEO AREA FOR SMALLER SCREENS --- */
+    max-width: none;     /* Allow it to take more width */
+    width: auto;         /* Defaults to available width as a block element */
+    margin-left: 0;      /* Reset left margin for standard block flow */
+    margin-right: 0;     /* Reset right margin for standard block flow */
+    /* Alternatively, to center it on small screens:
+    /* margin-left: auto; */
+    /* margin-right: auto; */
+    /* width: 95%; /* Or a suitable percentage */
+    padding: 15px;       /* Override inline padding for smaller screens if desired */
+  }
+
+  .ipfs-video-area video {
+    width: 95%; /* Make video more responsive within its container on smaller screens */
+    /* The video's inline max-width: 720px will still be respected. */
   }
 }
 
@@ -34,3 +108,76 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   z-index: 1000;
 }
+
+/* --- NEW STYLES FOR DISCORD WIDGET SECTION --- */
+.discord-widget-card {
+  /* The Card component might have its own padding.
+     The margin-top is handled by an inline style in Game.jsx (style={{ marginTop: '40px' }})
+     but you can add a default here if preferred. */
+  text-align: center; /* Centers the title and text within the card */
+  margin-top: 2rem; /* Default margin, can be overridden by inline styles if needed */
+}
+
+.game-discord-widget {
+  /* Specific styles for the Discord widget Card on the Game page */
+  background-color: #ffffff; /* Solid white background for the card, or a theme-consistent color */
+  border: 1px solid #e0e0e0; /* Optional: adds a light border */
+  padding: 20px; /* Padding inside the card, around the title, text, and iframe container */
+  /* The Card component itself might provide some base padding. Adjust as needed. */
+  /* Ensure it doesn't exceed the width of the game-content or becomes too wide on its own */
+  max-width: 400px; /* Example max-width, adjust to fit your design. The iframe width is 350px. */
+  margin-left: auto; /* Center the card if it's narrower than its container */
+  margin-right: auto; /* Center the card if it's narrower than its container */
+}
+
+.discord-widget-title {
+  font-size: 1.8rem; /* Adjust size as needed */
+  margin-bottom: 0.75rem;
+  color: #333; /* Dark text color for readability */
+}
+
+.discord-widget-text {
+  font-size: 1rem; /* Adjust size as needed */
+  margin-bottom: 1.5rem;
+  color: #555; /* Slightly lighter text color */
+}
+
+.discord-iframe-container {
+  display: flex; /* Enables flexbox for centering */
+  justify-content: center; /* Centers the iframe horizontally */
+  align-items: center; /* Centers the iframe vertically (if container has height) */
+  border-radius: 8px; /* Optional: if you want rounded corners for the iframe's container */
+  overflow: hidden; /* Ensures the iframe itself respects the container's border-radius */
+  /* The iframe has width="350" set in Game.jsx, so this container will center that.
+     If the iframe has a set width, this container doesn't strictly need a width itself,
+     unless you want to add padding or borders around the iframe directly within this container. */
+}
+
+/* Optional: Responsive adjustments for the widget if needed */
+@media (max-width: 480px) {
+  .game-discord-widget {
+    padding: 15px; /* Slightly reduce padding on very small screens */
+    max-width: 100%; /* Allow it to take full width of its parent on small screens */
+  }
+
+  .discord-widget-title {
+    font-size: 1.5rem; /* Adjust title font size for smaller screens */
+  }
+
+  .discord-widget-text {
+    font-size: 0.9rem; /* Adjust text font size for smaller screens */
+  }
+
+  /* The iframe itself has a fixed width of 350px in the JSX.
+     If you need the iframe to be responsive, you would remove the width attribute
+     from the iframe tag in Game.jsx and control it here with CSS: */
+  /*
+  .discord-iframe-container iframe {
+    width: 100%;
+    max-width: 350px; // Ensures it doesn't get wider than Discord's intended widget size
+    min-height: 400px; // Keep a reasonable height
+  }
+  */
+}
+
+/* --- END OF NEW STYLES FOR DISCORD WIDGET SECTION --- */

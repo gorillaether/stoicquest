@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Stoic Quest",
+  "name": "Stoic Quest: Enchiridion Journey",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,7 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#2c3e50",
+  "background_color": "#f0f0e0",
+  "description": "Embark on a journey through Epictetus' Enchiridion and cultivate your inner wisdom."
 }

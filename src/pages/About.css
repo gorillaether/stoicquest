@@ -1,10 +1,15 @@
 /* src/pages/About.css */
 
+/* ... (your existing styles remain the same) ... */
+
 .about-page-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: #f8f9fa;
+  background-image: url('https://aqua-gigantic-haddock-37.mypinata.cloud/ipfs/bafybeibimjlkuf6i3nv6lgfpociqutigfip6gy775qobvrzg4vr7ledb2u');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -19,32 +24,82 @@
   max-width: 800px;
   width: 100%;
   padding: 2rem;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.95); /* Slightly more opaque for better readability over complex BG */
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .about-title {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  color: #222;
+  font-size: 2.2rem; /* Slightly larger */
+  margin-bottom: 1.5rem; /* Increased margin */
+  color: #2c3e50; /* Darker, more modern blue/grey */
   text-align: center;
+  font-weight: 600;
 }
 
 .about-subtitle {
-  font-size: 1.5rem;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  color: #333;
+  font-size: 1.75rem; /* Slightly larger */
+  margin-top: 2.5rem; /* Increased margin */
+  margin-bottom: 1.25rem; /* Increased margin */
+  color: #34495e; /* Slightly softer dark blue/grey */
+  border-bottom: 2px solid #e0e0e0; /* Subtle separator */
+  padding-bottom: 0.5rem; /* Space below text before border */
+  font-weight: 500;
 }
 
 .about-text {
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #444;
-  margin-bottom: 1rem;
+  font-size: 1rem; /* Standard readable size */
+  line-height: 1.7; /* Improved line spacing */
+  color: #333; /* Dark grey for good contrast */
+  margin-bottom: 1.25rem; /* Consistent paragraph spacing */
 }
 
+/* --- NEW CSS for Enchiridion section --- */
+.enchiridion-text-section {
+  margin-top: 1rem;
+}
+
+.about-list {
+  list-style-type: disc; /* Or 'circle', 'square', or none if you prefer custom icons */
+  margin-left: 20px; /* Indent list items */
+  padding-left: 1rem; /* Add some padding */
+}
+
+.about-list li {
+  margin-bottom: 0.75rem; /* Space between list items */
+}
+
+.about-list li a {
+  color: #2980b9; /* A nice blue for links */
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.about-list li a:hover {
+  text-decoration: underline;
+  color: #1c5a80; /* Darker blue on hover */
+}
+
+.about-tertiary-title { /* For sub-headings within sections if needed */
+  font-size: 1.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.scrollable-text-area { /* If you choose to embed long text */
+  max-height: 400px; /* Or your desired height */
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-top: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  line-height: 1.6;
+}
+
+/* ... (existing .about-links styles can remain) ... */
 .about-links {
   margin-top: 2rem;
   display: flex;

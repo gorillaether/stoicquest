@@ -1,47 +1,193 @@
-/* src/pages/Home.css */
+/* src/pages/Home.css - Late Hellenistic / Early Imperial Roman Theme */
+
+/* Import a Roman-style header font and a classic body font from Google Fonts */
+/* You'll need to add these link tags to your public/index.html or import in main CSS */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:wght@400;600&display=swap');
+
+
+/* Overall page container */
 .home-page-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh; /* Ensure the container takes at least the full viewport height */
-  font-family: sans-serif; /* Example font */
-  background-color: #f0f8ff; /* Light blue background (example) */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure it takes at least full viewport height */
+    font-family: 'Cormorant Garamond', Georgia, serif; /* Body text font */
+    /* The #f0f0e0 will act as a final fallback if the image doesn't load */
+    background-color: #f0f0e0;
+    color: #2c3e50; /* Dark 'stone' grey text */
+
+    /* --- MOVED & MODIFIED: FAINT BACKGROUND IMAGE STYLES --- */
+    /* Applied to the full container now for wider background */
+    background-image:
+        /* Overlay to make the image faint.
+           Using 0.65 opacity for the overlay (35% image visibility).
+           Adjust 0.65 (0.0 to 1.0) to control faintness:
+           Lower value = image more visible. Higher value = image fainter. */
+        linear-gradient(rgba(240, 240, 224, 0.65), rgba(240, 240, 224, 0.65)),
+        /* Your specified background image URL */
+        url('https://aqua-gigantic-haddock-37.mypinata.cloud/ipfs/bafybeic5pzzwfcyo72u62ytmouta242hmgaeed3zjmmzhavboyur7vsrfa');
+
+    background-size: cover;         /* Scale image to cover the entire container */
+    background-position: center center; /* Center the image */
+    background-repeat: no-repeat;     /* Do not repeat the image */
+    /* Optional: Fixes the background image during scroll (parallax effect). Remove if not desired. */
+    background-attachment: fixed;
+    /* --- END OF MOVED BACKGROUND IMAGE STYLES --- */
 }
 
+/* Header and Footer for consistent layout */
+.home-page-container > header {
+    /* Styles for the header if you include it */
+    /* Ensure header has its own background if it needs to sit on top distinctly */
+    /* background-color: rgba(44, 62, 80, 0.8); */
+    /* color: #e6b88a; */
+    /* padding: 10px 20px; */
+    /* border-bottom: 3px solid #e6b88a; */
+    position: relative; /* Helps manage stacking if header/footer have specific needs */
+    z-index: 10; /* Ensure header is above the page container's background */
+}
+
+.home-page-container > footer {
+     /* Styles for the footer if you include it */
+     /* Ensure footer has its own background */
+     /* background-color: #2c3e50; */
+     /* color: #f0f0e0; */
+     /* padding: 15px 20px; */
+     /* text-align: center; */
+     /* border-top: 3px solid #e6b88a; */
+    position: relative;
+    z-index: 10; /* Ensure footer is above the page container's background */
+}
+
+
+/* Content area containing the video and card */
 .home-page-content {
-  flex: 1; /* Allows the content area to grow */
-  padding: 20px;
-  display: flex;
-  justify-content: center; /* Center the card horizontally */
-  align-items: center; /* Center the card vertically if content is short */
+    flex: 1; /* Allows content to grow and fill available space */
+    display: flex;
+    flex-direction: column; /* Stack video and card vertically */
+    align-items: center; /* Center content horizontally */
+    padding: 30px 20px; /* More padding */
+    max-width: 1000px; /* Allow a bit wider content FOR THE CONTENT BLOCK ITSELF */
+    margin: 30px auto; /* Center the block and add space */
+    /* This div NO LONGER has its own background image.
+       It will be transparent, allowing .home-page-container's background to show through,
+       except where .welcome-card and .home-video-area have their own backgrounds. */
+    position: relative; /* To ensure its children with z-index stack correctly within it */
+    z-index: 1; /* To ensure this content block is above its parent's direct background if needed, though card/video area handle their own */
 }
 
+/* Styling for the video container */
+.home-video-area {
+    width: 100%; /* Take full width of home-page-content max-width */
+    max-width: 800px; /* Limit video size */
+    margin-bottom: 40px; /* More space below the video */
+    border: 8px solid #a16e2b; /* Bronze/Gold frame */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3); /* Pronounced shadow */
+    background-color: #000; /* Black background for video area - this will sit on top of the page background */
+    text-align: center; /* Center title/caption */
+    color: #f0f0e0; /* Light text for title/caption */
+    padding-bottom: 15px; /* Space for caption */
+    position: relative;
+    z-index: 2; /* Higher z-index than .home-page-content to be clearly on top */
+}
+
+.home-video-area h2 {
+    font-family: 'Cinzel Decorative', cursive; /* Roman header font */
+    color: #e6b88a; /* Muted bronze/gold title color */
+    margin-top: 10px; /* Space above title */
+    margin-bottom: 15px;
+    font-size: 2rem; /* Larger title */
+    text-transform: uppercase; /* Roman capitals */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+.home-video-area video {
+    display: block; /* Remove extra space below video */
+    margin: 0 auto; /* Center the video element itself */
+    max-width: 100%; /* Ensure video is responsive within its container */
+    height: auto; /* Maintain aspect ratio */
+    border-bottom: 2px solid #e6b88a; /* Bronze line under video */
+    margin-bottom: 10px; /* Space below video before caption */
+}
+
+.home-video-area p {
+    font-size: 1.1rem; /* Slightly larger caption text */
+    color: #ccc; /* Lighter text for caption */
+    margin-top: 10px;
+}
+
+
+/* Styling for the Welcome Card */
 .welcome-card {
-  max-width: 700px; /* Limit the maximum width of the card */
-  width: 100%; /* Ensure the card takes full width up to max-width */
-  padding: 40px; /* Adjust padding */
-  text-align: center; /* Center text within the card */
-  background-color: white; /* White background for the card */
+    background-color: #fff; /* White marble effect - this will sit on top of the page background */
+    border: 1px solid #bdc3c7; /* Light grey marble line */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Stronger shadow */
+    padding: 40px; /* More padding */
+    text-align: center;
+    width: 100%; /* Take full width of home-page-content */
+    max-width: 700px; /* Limit card width */
+    border-radius: 4px; /* Sharper corners */
+    position: relative;
+    z-index: 2; /* Higher z-index than .home-page-content to be clearly on top */
 }
 
 .home-title {
-  font-size: 2.5rem;
-  color: #333;
-  margin-bottom: 15px;
+    font-family: 'Cinzel Decorative', cursive; /* Roman header font */
+    font-size: 3.5rem; /* Even larger title */
+    color: #2c3e50; /* Dark stone blue */
+    margin-bottom: 20px;
+    text-transform: uppercase; /* Roman capitals */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
 }
 
 .home-subtitle {
-  font-size: 1.2rem;
-  color: #555;
-  margin-bottom: 30px;
+    font-size: 1.6rem; /* Slightly larger subtitle */
+    color: #34495e; /* Slightly lighter stone blue */
+    margin-bottom: 30px;
+    font-style: italic;
 }
 
 .home-text {
-  color: #666;
-  font-size: 1rem;
-  line-height: 1.6;
-  margin-bottom: 30px;
+    font-size: 1.2rem; /* Larger body text */
+    line-height: 1.8; /* Improved readability */
+    color: #555; /* Softer grey for body */
+    margin-bottom: 40px;
 }
 
 .start-button-container {
-    margin-top: 20px;
+    margin-top: 30px;
 }
+
+/* Style the Button component for a bronze/stone look */
+/* Assuming Button takes 'variant' and 'size' or has a general class */
+/* .button (general button styles) */
+/*
+.button {
+     font-family: 'Cinzel Decorative', cursive;
+     text-transform: uppercase;
+     // Add padding, border-radius, cursor etc.
+}
+*/
+
+/* .button.primary (specific primary variant styles) */
+/*
+.button.primary {
+    background-color: #a16e2b; // Bronze/gold color
+    color: #f0f0e0; // Light text
+    border: 2px solid #e6b88a; // Muted gold border
+    padding: 15px 30px; // More padding
+    font-size: 1.3rem; // Larger font
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    text-decoration: none; // Remove link underline
+    display: inline-block; // Ensure padding works
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.button.primary:hover {
+    background-color: #c88a3c; // Lighter bronze on hover
+    border-color: #f0d9a1; // Lighter gold on hover
+}
+*/
+
+/* Add more specific styles for other elements as needed */

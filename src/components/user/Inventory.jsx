@@ -2,7 +2,8 @@
 import React from 'react';
 import './Inventory.css';
 import { useUser } from '../../contexts/UserContext'; // Import UserContext
-import { avatars } from '../../data/avatars'; // Import avatars data to potentially show owned avatar details
+// FIX: Import avatars as the default export and getAvatarById as a named export
+import avatars, { getAvatarById } from '../../data/avatars';
 
 /**
  * Displays the user's inventory, including tokens, collectibles, and owned NFT avatars.
@@ -12,7 +13,12 @@ const Inventory = () => {
 
   // Helper to get avatar details by ID for owned NFTs
   const getAvatarDetails = (avatarId) => {
-      return avatars.find(avatar => avatar.id === avatarId);
+      // This function is correct, as getAvatarById is a named export
+      return getAvatarById(avatarId);
+      // Note: You were originally trying to use avatars.find here, which is also fine,
+      // but using the exported getAvatarById is generally better if available and tested.
+      // The original line would work with the corrected import:
+      // return avatars.find(avatar => avatar.id === avatarId);
   }
 
   return (
@@ -47,12 +53,13 @@ const Inventory = () => {
         {user?.ownedNfts && user.ownedNfts.length > 0 ? (
           <ul className="inventory-list owned-nfts-list">
             {user.ownedNfts.map((avatarId) => {
-                const avatar = getAvatarDetails(avatarId); // Get avatar details
+                // Use getAvatarDetails helper here
+                const avatar = getAvatarDetails(avatarId);
                 return avatar ? (
                      <li key={avatar.id} className="inventory-item owned-nft-item">
                        {/* Display owned NFT avatar details */}
                        <img src={avatar.imageUrl} alt={avatar.name} className="owned-nft-thumbnail" />
-                       <span>{avatar.name} (Level {avatar.levelRequired})</span> {/* Show name and required level */}
+                       <span>{avatar.name} (Level {avatar.requiredLevel})</span> {/* Show name and required level */}
                        {/* In a real app, you might link to the NFT on a marketplace */}
                        {/* <a href={`[Link to Marketplace]/token/${avatar.id}`} target="_blank" rel="noopener noreferrer">View NFT</a> */}
                      </li>

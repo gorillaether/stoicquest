@@ -1,25 +1,19 @@
-// src/App.jsx
+// src/App.jsx (This is the change you need to make and save)
 import React from 'react';
-import './App.css'; // Import global styles for the App container
-import { UserProvider } from './contexts/UserContext'; // Import the User Context Provider
-import { GameProvider } from './contexts/GameContext'; // Import the Game Context Provider
-import AppRoutes from './routes'; // Import the AppRoutes component that defines your routes
+import './App.css';
+// import { UserProvider } from './contexts/UserContext'; // <<< --- DELETE or COMMENT OUT this line
+import { GameProvider } from './contexts/GameContext';
+import AppRoutes from './routes';
 
 function App() {
   return (
-    // Wrap the entire application with the context providers
-    <UserProvider>
+    // <UserProvider> {/* <<< --- DELETE or COMMENT OUT this line */}
       <GameProvider>
         <div className="App">
-          {/*
-            The AppRoutes component contains your routing configuration.
-            It will render the appropriate page component (Home, Game, Profile, etc.)
-            based on the current URL path.
-          */}
           <AppRoutes />
         </div>
       </GameProvider>
-    </UserProvider>
+    // </UserProvider> {/* <<< --- DELETE or COMMENT OUT this line */}
   );
 }
 

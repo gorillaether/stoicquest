@@ -1,54 +1,130 @@
 // src/components/layout/Header.jsx
 import React from 'react';
-import './Header.css';
-import { useUser } from '../../contexts/UserContext'; // Import UserContext
-import useGameProgress from '../../hooks/useGameProgress'; // Import the game progress hook
-import Avatar from '../user/Avatar'; // Import the Avatar component
-import ProgressBar from '../ui/ProgressBar'; // Import ProgressBar component
-// import { getXpForNextLevel } from '../../utils/levelUtils'; // Assuming a utility to get XP needed for next level
+import './Header.css'; // Ensure this CSS file exists or remove if not used
+import { useUser } from '../../contexts/UserContext';
+import useGameProgress from '../../hooks/useGameProgress';
+import Avatar from '../user/Avatar';
+import ProgressBar from '../ui/ProgressBar';
+import { Link } from 'react-router-dom';
+import ConnectWalletButton from '../ui/ConnectWalletButton';
+import { getLevelProgressPercentage } from '../../utils/levelUtils'; // <-- IMPORT THIS
 
 const Header = () => {
-  const { user } = useUser(); // Get user data from context
-  const { overallProgress } = useGameProgress(); // Get overall game progress
+  // console.log("DEBUG: Header.jsx - Rendering. Attempting to call useUser().");
+  const contextFromHook = useUser();
+  // console.log("DEBUG: Header.jsx - Value RECEIVED from useUser():", contextFromHook);
 
-  // Calculate progress towards the next level (Example)
-  // const xpNeededForNextLevel = getXpForNextLevel(user.level);
-  // const xpProgressPercentage = xpNeededForNextLevel > 0 ? ((user.xp - getXpForCurrentLevel(user.level)) / xpNeededForNextLevel) * 100 : 0; // Requires getXpForCurrentLevel utility
+  if (contextFromHook === undefined) {
+    console.error("DEBUG: Header.jsx - CRITICAL - useUser() returned undefined to Header.jsx. CANNOT DESTRUCTURE.");
+    // Fallback UI
+    return (
+        <header className="header-container">
+            <div className="game-title">
+               <Link to="/"><h1>Stoic Quest</h1></Link>
+            </div>
+            <nav className="main-nav"> {/* Navigation for fallback */}
+              <ul className="nav-list">
+                <li className="nav-item"><Link to="/">Home</Link></li>
+                <li className="nav-item"><Link to="/game">Game</Link></li>
+                <li className="nav-item"><Link to="/profile">Profile</Link></li>
+                <li className="nav-item"><Link to="/about">About</Link></li>
+              </ul>
+            </nav>
+             <div className="user-status-section">
+                  <span style={{ marginRight: '20px', color: 'red' }}>Error: User Context not loaded!</span>
+                  <ConnectWalletButton />
+             </div>
+        </header>
+    );
+  }
 
+  const { 
+    user, 
+    currentAvatar, 
+    loading: userLoading, 
+    walletAddress: userAddress
+  } = contextFromHook; 
+  
+  // console.log("DEBUG: Header.jsx - Destructuring successful. User from context:", user, "Effective userAddress (from walletAddress):", userAddress);
 
+  const { getOverallProgress } = useGameProgress(); // <-- Get the FUNCTION
+
+  // Call the function to get progress data
+  const gameProgressData = getOverallProgress(); 
+  
+  // Calculate the display percentage using currentXP from gameProgressData and levelUtils
+  // Ensure gameProgressData and gameProgressData.currentXP are available
+  const displayOverallProgress = gameProgressData && typeof gameProgressData.currentXP === 'number'
+    ? getLevelProgressPercentage(gameProgressData.currentXP) 
+    : 0;
+
+  const userName = user?.name || 'Guest';
+  const userLevel = gameProgressData?.currentLevel || user?.level || 1; // Prefer level from gameProgressData if available
+
+  if (userLoading && !userAddress) { 
+      // console.log("DEBUG: Header.jsx - Showing loading state (userLoading true, no userAddress).");
+      // Fallback UI for loading state
+      return (
+          <header className="header-container">
+              <div className="game-title">
+                 <Link to="/"><h1>Stoic Quest</h1></Link>
+              </div>
+              <nav className="main-nav"> {/* Navigation for loading state */}
+                <ul className="nav-list">
+                  <li className="nav-item"><Link to="/">Home</Link></li>
+                  <li className="nav-item"><Link to="/game">Game</Link></li>
+                  <li className="nav-item"><Link to="/profile">Profile</Link></li>
+                  <li className="nav-item"><Link to="/about">About</Link></li>
+                </ul>
+              </nav>
+               <div className="user-status-section">
+                    <span style={{ marginRight: '20px' }}>Loading...</span>
+                    <ConnectWalletButton />
+               </div>
+          </header>
+      );
+  }
+
+  // console.log("DEBUG: Header.jsx - Rendering normal header. User:", userName, "Level:", userLevel, "userAddress:", userAddress, "Progress%:", displayOverallProgress);
   return (
     <header className="header-container">
-      {/* App title */}
       <div className="game-title">
-         <h1>Game Title</h1>
+         <Link to="/"><h1>Stoic Quest</h1></Link>
       </div>
 
+      <nav className="main-nav">
+        <ul className="nav-list">
+          <li className="nav-item"><Link to="/">Home</Link></li>
+          <li className="nav-item"><Link to="/game">Game</Link></li>
+          <li className="nav-item"><Link to="/profile">Profile</Link></li>
+          <li className="nav-item"><Link to="/about">About</Link></li>
+        </ul>
+      </nav>
 
       <div className="user-status-section">
-        {/* User Avatar, Name, Level */}
-        <div className="user-info">
-          <Avatar /> {/* Use the Avatar component */}
-          <div className="user-details">
-             <span className="user-name">{user?.name || 'Guest'}</span> {/* Display user name */}
-             <span className="user-level">Level: {user?.level || 1}</span> {/* Display user level */}
-          </div>
-        </div>
+        {userAddress ? ( 
+          <>
+            <div className="user-info">
+              <Avatar currentAvatar={currentAvatar} />
+              <div className="user-details">
+                 <span className="user-name">{userName}</span>
+                 <span className="user-level">Level: {userLevel}</span>
+              </div>
+            </div>
 
-        {/* Overall Game Progress and optionally Next Level Progress */}
-        <div className="game-progress-info">
-          <div className="overall-progress">
-              <span className="progress-label">Overall Progress:</span>
-              <ProgressBar percentage={overallProgress} /> {/* Use ProgressBar for overall game progress */}
-              <span className="progress-percentage">{overallProgress.toFixed(0)}%</span>
-          </div>
-
-           {/* Optional: Progress towards the next level */}
-           {/* <div className="next-level-progress">
-               <span className="progress-label">Next Level:</span>
-               <ProgressBar percentage={xpProgressPercentage} />
-               <span className="progress-text">{user.xp} / {user.xp + xpNeededForNextLevel} XP</span>
-           </div> */}
-        </div>
+            <div className="game-progress-info">
+              <div className="overall-progress">
+                  <span className="progress-label">Overall Progress:</span>
+                  <ProgressBar percentage={displayOverallProgress} />
+                  <span className="progress-percentage">{displayOverallProgress.toFixed(0)}%</span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div style={{ minWidth: '200px' }}> {/* Placeholder for when no wallet is connected */} </div>
+        )}
+        
+        <ConnectWalletButton />
       </div>
     </header>
   );

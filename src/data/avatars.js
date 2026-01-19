@@ -4,14 +4,14 @@ const avatars = [
   {
     id: 'novice', // Using string IDs for consistency
     name: "Novice",
-    imageUrl: "avatars/novice.png", // Adjusted key name
+    imageUrl: "/assets/images/avatars/novice.png", // Adjusted key name
     requiredLevel: 1,
     description: "Taking the first steps on the Stoic path"
   },
   {
     id: 'apprentice',
     name: "Apprentice",
-    imageUrl: "avatars/apprentice.png",
+    imageUrl: "/assets/images/avatars/apprentice.png",
     requiredLevel: 5,
     description: "Beginning to grasp key Stoic principles"
   },

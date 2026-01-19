@@ -1,16 +1,68 @@
 /* src/components/user/Profile.css */
+
 .profile-container {
   padding: 20px;
   font-family: sans-serif; /* Example font */
+  position: relative; /* Crucial for positioning the ::before pseudo-element */
+  background-color: #ffffff; /* Fallback background, or the color you want the image to fade into.
+                                 If you are using Tailwind's 'bg-white' on the div,
+                                 this might be redundant or you can choose a different color. */
+  overflow: hidden; /* Optional: can help contain the pseudo-element if any edge issues */
 }
+
+.profile-container::before {
+  content: ""; /* Required for pseudo-elements */
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0; /* Sits behind the content (which will have z-index: 1 or higher) */
+
+  /* --- Background Image Section --- */
+  /* Replace 'YOUR_PINATA_IPFS_JPEG_URL_HERE' with your actual image URL */
+  background-image: url('https://aqua-gigantic-haddock-37.mypinata.cloud/ipfs/bafybeids5kfavcnj5jlyi3rh72shbrjpetsgoakypnm3hjoi7jal7qlfui');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Optional: Creates a fixed background. Remove if not desired. */
+
+  /* --- Fading Techniques --- */
+
+  /* Option 1: Reduce opacity of the image */
+  opacity: 0.3; /* Adjust this value between 0 (fully transparent) and 1 (fully opaque).
+                   0.2 to 0.5 often works well for a faded effect. */
+
+  /* Option 2: Overlay a semi-transparent color (can be used with or instead of opacity) */
+  /* To use this, you might set opacity above to 1 or a higher value,
+     or remove the opacity property and uncomment the line below.
+     This example adds a white semi-transparent layer. */
+  /* box-shadow: inset 0 0 0 2000px rgba(255, 255, 255, 0.85); */ /* White fade, adjust opacity (0.85) */
+  /* Or for a dark fade (if your text is light): */
+  /* box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.5); */ /* Dark fade */
+}
+
+/* Ensure all direct content children of .profile-container are above the ::before pseudo-element */
+.profile-title,
+.profile-header,
+.inventory-container, /* Assuming .inventory-container is a direct child or you style its wrapper */
+.profile-avatars-section,
+.profile-empty-state,
+.next-avatar-preview {
+  position: relative; /* Ensures it can stack above the pseudo-element */
+  z-index: 1; /* Places it on top of the ::before pseudo-element (which has z-index: 0) */
+}
+
+/* --- Previous styles (ensure they don't conflict, text colors are important) --- */
 
 .profile-title {
   margin-top: 0;
-  color: #333;
+  color: #333; /* Ensure this has good contrast against the faded background */
   font-size: 1.8rem;
   margin-bottom: 20px;
-  border-bottom: 2px solid #eee; /* Separator */
+  border-bottom: 2px solid #eee;
   padding-bottom: 10px;
+  /* position: relative; z-index: 1; already covered above */
 }
 
 .profile-header {
@@ -19,104 +71,116 @@
   gap: 20px;
   margin-bottom: 20px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #eee; /* Separator */
+  border-bottom: 1px solid #eee;
+  /* position: relative; z-index: 1; already covered above */
 }
-
-/* Styles for the Avatar component within the profile header are handled in Avatar.css */
-/* .profile-header .avatar-container { ... } */
-
 
 .profile-basic-info p {
   margin: 5px 0;
-  color: #555;
+  color: #555; /* Ensure good contrast */
   font-size: 1rem;
 }
 
 .profile-basic-info strong {
-  color: #333;
+  color: #333; /* Ensure good contrast */
 }
 
-/* Styles for the Inventory component within the profile are handled in Inventory.css */
-/* .profile-container .inventory-container { ... } */
-
-
 .profile-avatars-section {
-    margin-top: 30px;
-    border-top: 1px solid #eee;
-    padding-top: 20px;
+  margin-top: 30px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+  /* position: relative; z-index: 1; already covered above */
 }
 
 .profile-section-title {
-    font-size: 1.4rem;
-    color: #333;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 8px;
+  font-size: 1.4rem;
+  color: #333; /* Ensure good contrast */
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
 }
 
 .owned-avatars-list {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px; /* Space between avatar items */
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin: 0;
 }
 
 .owned-avatar-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background-color: #f9f9f9;
-    padding: 10px 15px;
-    border-radius: 5px;
-    border: 1px solid #eee;
-    font-size: 0.9rem;
-    color: #555;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background-color: #f9f9f9; /* This item's background will sit on top of the faded main background */
+  /* For more blending: background-color: rgba(249, 249, 249, 0.7); */
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #eee;
+  font-size: 0.85rem;
+  color: #555;
+  width: 100px;
+  text-align: center;
+  /* These items are children of .owned-avatars-list, which is inside .profile-avatars-section.
+     So they are already in the correct stacking context if .profile-avatars-section has z-index:1. */
 }
 
 .owned-avatar-thumbnail {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid #ccc; /* Example border */
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ccc;
 }
 
 .profile-empty-state {
-    font-style: italic;
-    color: #777;
-    text-align: center;
+  font-style: italic;
+  color: #777; /* Ensure good contrast */
+  text-align: center;
+  width: 100%;
+  padding: 20px 0;
+  /* position: relative; z-index: 1; already covered above */
 }
 
 .next-avatar-preview {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px dashed #ccc;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px dashed #ccc;
+  /* position: relative; z-index: 1; already covered above */
 }
 
 .next-avatar-title {
-     font-size: 1.2rem;
-     color: #333;
-     margin-bottom: 10px;
+  font-size: 1.2rem;
+  color: #333; /* Ensure good contrast */
+  margin-bottom: 10px;
 }
 
 .next-avatar-info {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .next-avatar-thumbnail {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #007bff; /* Example highlight border */
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #007bff;
 }
 
 .next-avatar-info p {
-    margin: 0;
-    color: #555;
-    font-size: 1rem;
+  margin: 0;
+  color: #555; /* Ensure good contrast */
+  font-size: 1rem;
 }
+
+/* If you have an .inventory-container class for the inventory section wrapper, ensure it's also covered */
+/* For example:
+.inventory-container {
+  position: relative;
+  z-index: 1;
+}
+*/

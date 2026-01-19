@@ -20,6 +20,42 @@ const achievements = [
     xpReward: 150
   },
   {
+    id: "allCh2",
+    title: "Master of Desire",
+    description: "Complete all challenges in Chapter 2",
+    icon: "icons/compass.png",
+    condition: "chapter_complete",
+    requiredValue: 2,
+    xpReward: 150
+  },
+  {
+    id: "allCh3",
+    title: "Attachment Expert",
+    description: "Complete all challenges in Chapter 3",
+    icon: "icons/heart.png",
+    condition: "chapter_complete",
+    requiredValue: 3,
+    xpReward: 175
+  },
+  {
+    id: "allCh4",
+    title: "Challenge Conqueror",
+    description: "Complete all challenges in Chapter 4",
+    icon: "icons/mountain.png",
+    condition: "chapter_complete",
+    requiredValue: 4,
+    xpReward: 200
+  },
+  {
+    id: "allCh5",
+    title: "Master of Mind",
+    description: "Complete all challenges in Chapter 5",
+    icon: "icons/brain.png",
+    condition: "chapter_complete",
+    requiredValue: 5,
+    xpReward: 225
+  },
+  {
     id: "reflect10",
     title: "Deep Thinker",
     description: "Complete 10 reflections",
@@ -63,6 +99,24 @@ const achievements = [
     condition: "evening_reflections",
     requiredValue: 5,
     xpReward: 150
+  },
+  {
+    id: "stoic_dedication",
+    title: "Stoic Dedication",
+    description: "Complete at least 15 different reflections across all chapters",
+    icon: "icons/pen.png",
+    condition: "total_reflections",
+    requiredValue: 15,
+    xpReward: 275
+  },
+  {
+    id: "practical_wisdom",
+    title: "Practical Wisdom",
+    description: "Complete at least 10 different challenges across all chapters",
+    icon: "icons/tasks.png",
+    condition: "total_challenges",
+    requiredValue: 10,
+    xpReward: 325
   },
   {
     id: "app_master",

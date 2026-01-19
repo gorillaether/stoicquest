@@ -1,17 +1,15 @@
 /* src/components/game/Challenge.css */
+
 .challenge-container {
+  width: 100%;
+  max-width: 100%;
   padding: 20px;
   border: 1px solid #ccc;
   margin-bottom: 20px;
   background-color: #f9f9f9;
   font-family: sans-serif;
+  box-sizing: border-box;
 }
-
-/* .challenge-completed {
-    border-color: #28a745;
-    background-color: #e9ffe9;
-} */
-
 
 .challenge-title {
   margin-top: 0;
@@ -33,20 +31,28 @@
 }
 
 .challenge-interactive-area p {
-    color: #777;
-    font-style: italic;
-    text-align: center;
+  color: #777;
+  font-style: italic;
+  text-align: center;
 }
 
-/* Add styles for specific challenge types (e.g., multiple-choice options, textarea) as needed */
-/*
-.challenge-interactive-area button { ... }
-.challenge-interactive-area textarea { ... }
-*/
+/* Wider textarea support for all challenge types */
+.challenge-interactive-area textarea {
+  width: 100%;
+  min-width: 800px;
+  max-width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  resize: vertical;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
 
-/* .challenge-completion-message {
-    margin-top: 20px;
-    font-weight: bold;
-    color: #28a745;
-    text-align: center;
-} */
+/* Optional: Success message styling */
+.challenge-completion-message {
+  margin-top: 20px;
+  font-weight: bold;
+  color: #28a745;
+  text-align: center;
+}

@@ -1,8 +1,9 @@
 // src/components/layout/Sidebar.jsx
 import React from 'react';
 import './Sidebar.css';
-import { chapters } from '../../data/chapters'; // Import chapters data
-import { useUser } from '../../contexts/UserContext'; // Import UserContext (if locking chapters by level)
+// FIX: Import the getAllChapters function instead of trying to import 'chapters' directly
+import { getAllChapters } from '../../data/chapters';
+import { useUser } from '../../contexts/UserContext'; // Import UserContext
 
 /**
  * Sidebar component for navigation and chapter selection.
@@ -13,14 +14,19 @@ import { useUser } from '../../contexts/UserContext'; // Import UserContext (if 
 const Sidebar = ({ onChapterSelect, currentChapterId }) => {
    const { user } = useUser(); // Get user data to check level for locked chapters
 
+  // Get the list of all chapters using the exported function
+  const allChapters = getAllChapters();
+
   return (
     <aside className="sidebar-container">
       <h2>Chapters</h2>
       <nav className="sidebar-nav">
         <ul>
-          {chapters.map((chapter) => {
+          {/* Use the result of getAllChapters().map instead of chapters.map */}
+          {allChapters.map((chapter) => {
             // Determine if the chapter is unlocked (Example: based on level or previous completion)
-            const isUnlocked = user.level >= (chapter.levelRequired || 1); // Assuming chapters have a levelRequired property
+            // Assuming chapters in your data have a 'requiredLevel' property
+            const isUnlocked = user.level >= (chapter.requiredLevel || 1); // Use requiredLevel consistent with avatars.js
 
             return (
               <li

@@ -1,86 +1,152 @@
 /* src/components/layout/Header.css */
+
 .header-container {
-  background-color: #f0f0f0;
-  padding: 10px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #ccc;
-  font-family: sans-serif;
+    display: flex;
+    justify-content: space-between; /* Distribute space between items */
+    align-items: center; /* Vertically center items */
+    padding: 15px 30px; /* More padding */
+    background-color: #bdc3c7; /* Light grey stone */
+    color: #2c3e50; /* Dark 'stone' grey text */
+    border-bottom: 3px solid #a16e2b; /* Bronze line divider */
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    gap: 25px; /* Increased gap between main flex items */
 }
 
 .game-title h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  color: #333;
+    margin: 0; /* Remove default margin */
+    font-size: 2rem; /* Larger size */
+    color: #2c3e50; /* Dark stone blue title color */
+    font-family: 'Cinzel Decorative', cursive; /* Roman header font */
+    text-transform: uppercase;
+    white-space: nowrap; /* Prevent title from wrapping */
 }
 
-.user-status-section {
+/* Style for the Link wrapping the title */
+.game-title a {
+    text-decoration: none; /* Remove underline from link */
+    color: inherit; /* Inherit color from the h1 */
+}
+
+
+/* --- Navigation Styling --- */
+.main-nav {
+    flex-grow: 1; /* Allow navigation to take up available space */
+    flex-shrink: 1; /* Allow navigation to shrink */
+    min-width: 250px; /* Added min-width to ensure it doesn't disappear */
+    text-align: center; /* Center the navigation links block */
+}
+
+.nav-list {
     display: flex;
-    align-items: center;
-    gap: 30px; /* Space between user info and progress */
+    justify-content: center; /* Center the list items within the nav block */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 30px; /* More space between list items */
+    flex-wrap: wrap; /* Allow nav items to wrap if container is too small */
 }
 
+.nav-item {
+    /* Styles for each <li> */
+}
+
+/* Style for the navigation links */
+.main-nav a {
+    text-decoration: none; /* Remove underline */
+    color: #2c3e50; /* Dark text color for links */
+    font-size: 1.5rem; /* Increased font size */
+    font-family: 'Cormorant Garamond', Georgia, serif; /* Body text font */
+    transition: color 0.3s ease;
+    white-space: nowrap; /* Prevent nav links from wrapping */
+    font-weight: 600; /* Semi-bolding for visibility */
+}
+
+.main-nav a:hover {
+    color: #a16e2b; /* Bronze/gold color on hover */
+}
+/* --- End Navigation Styling --- */
+
+
+/* --- User Status / Top Right Section Styling --- */
+.user-status-section {
+     display: flex;
+     align-items: center; /* Vertically center items */
+     gap: 35px; /* Significantly more space between user info and progress */
+     font-size: 1.4rem; /* <<< ADJUSTED: Increased base font size significantly */
+     white-space: nowrap; /* Prevent this section from wrapping */
+     flex-shrink: 0; /* Prevent this section from shrinking */
+     margin-left: 30px; /* More space to the left */
+}
 
 .user-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.9rem;
-  color: #555;
-}
-
-/* Styles for the Avatar component within the header */
-.user-info .avatar-container {
-    width: 40px; /* Smaller avatar in header */
-    height: 40px; /* Smaller avatar in header */
-    border-width: 2px; /* Slightly thinner border */
-    margin-bottom: 0; /* Remove bottom margin */
+     display: flex; /* Arrange avatar and details horizontally */
+     align-items: center;
+     gap: 15px; /* More gap */
+     flex-shrink: 0; /* Prevent shrinking */
 }
 
 .user-details {
-    display: flex;
-    flex-direction: column;
+     display: flex;
+     flex-direction: column; /* Stack name and level vertically */
+     font-size: 1.4rem; /* <<< ADJUSTED: Ensure font size is clearly readable */
+     line-height: 1.4; /* <<< Adjusted line height for spacing */
 }
 
 .user-name {
-    font-weight: bold;
-    color: #333;
+     font-weight: bold;
+     color: #2c3e50; /* Dark color for name */
 }
 
 .user-level {
-    font-size: 0.8rem;
-    color: #555;
+     color: #555; /* Softer color for level */
 }
 
 
 .game-progress-info {
-  display: flex;
-  flex-direction: column;
-  gap: 5px; /* Space between overall and next level progress */
+    /* Container for progress bars */
+    font-size: 1.4rem; /* <<< ADJUSTED: Ensure font size is clearly readable */
+    flex-shrink: 0; /* Prevent progress info from shrinking */
 }
 
-.overall-progress,
-.next-level-progress {
+.overall-progress, .next-level-progress {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 0.9rem;
-    color: #555;
+    flex-direction: column; /* Changed to column layout for better stacking */
+    align-items: flex-start; /* Align items to the start (left) */
+    gap: 8px; /* Adjusted gap for column layout */
 }
 
 .progress-label {
     font-weight: bold;
+    color: #555; /* Softer color */
+    font-size: 1.1rem; /* <<< ADJUSTED: Adjusted label size relative to parent */
 }
 
-
-/* Styles for the ProgressBar component within the header */
-.game-progress-info .progress-bar-container {
-    width: 150px; /* Adjust width as needed */
-    height: 12px; /* Adjust height as needed */
+.progress-percentage, .progress-text {
+    /* Font size inherited from parent game-progress-info or user-status-section */
+    color: #a16e2b; /* Bronze/gold for percentage */
+    font-weight: bold; /* Added bolding */
+    font-size: 1.3rem; /* <<< Adjusted explicit font size */
 }
 
-.progress-percentage {
-    font-size: 0.8rem;
-    font-weight: bold;
+/* --- Avatar Styling (assuming these classes are used by your Avatar.jsx component) --- */
+.avatar-container {
+    width: 50px; /* Set a consistent size */
+    height: 50px;
+    border-radius: 50%; /* Makes it round */
+    overflow: hidden; /* Clips the image to the circle */
+    border: 3px solid #a16e2b; /* Added a clear bronze border */
+    background-color: #fff; /* White background if image doesn't fill */
+    flex-shrink: 0; /* Prevent avatar from shrinking */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2); /* Subtle shadow */
 }
+
+.avatar-image {
+    display: block; /* Remove extra space below */
+    width: 100%; /* Make image fill the container */
+    height: 100%;
+    object-fit: cover; /* Crop image nicely to fill the circle */
+}
+/* --- End Avatar Styling --- */
+
+
+/* You'll also need to style the ProgressBar component itself in its own CSS file */
